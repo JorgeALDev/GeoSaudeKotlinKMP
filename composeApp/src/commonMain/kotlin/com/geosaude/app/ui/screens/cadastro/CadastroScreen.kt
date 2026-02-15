@@ -25,12 +25,111 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.geosaude.app.ui.components.IllustrationSection
 import com.geosaude.app.ui.theme.GeoSaudeColors
 
 @Composable
 fun CadastroScreen(
     onNavigateToLogin: () -> Unit,
     onCadastroSuccess: () -> Unit
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val isDesktop = maxWidth >= 800.dp
+
+        if (isDesktop) {
+            CadastroScreenDesktop(
+                onNavigateToLogin = onNavigateToLogin,
+                onCadastroSuccess = onCadastroSuccess
+            )
+        } else {
+            CadastroScreenMobile(
+                onNavigateToLogin = onNavigateToLogin,
+                onCadastroSuccess = onCadastroSuccess
+            )
+        }
+    }
+}
+
+@Composable
+private fun CadastroScreenDesktop(
+    onNavigateToLogin: () -> Unit,
+    onCadastroSuccess: () -> Unit
+) {
+    Row(modifier = Modifier.fillMaxSize()) {
+        // Lado esquerdo: Ilustração (50%)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .background(GeoSaudeColors.Background),
+            contentAlignment = Alignment.Center
+        ) {
+            IllustrationSection()
+        }
+
+        // Lado direito: Formulário (50%)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .background(GeoSaudeColors.White),
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 520.dp)
+                    .fillMaxHeight(0.95f) // 95% da altura
+                    .padding(horizontal = 48.dp, vertical = 24.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = GeoSaudeColors.CardBackground
+                )
+            ) {
+                CadastroForm(
+                    onNavigateToLogin = onNavigateToLogin,
+                    onCadastroSuccess = onCadastroSuccess,
+                    isDesktop = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CadastroScreenMobile(
+    onNavigateToLogin: () -> Unit,
+    onCadastroSuccess: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(GeoSaudeColors.Background),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.95f) // 95% da altura
+                .padding(24.dp),
+            shape = RoundedCornerShape(32.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = GeoSaudeColors.CardBackground
+            )
+        ) {
+            CadastroForm(
+                onNavigateToLogin = onNavigateToLogin,
+                onCadastroSuccess = onCadastroSuccess,
+                isDesktop = false
+            )
+        }
+    }
+}
+
+@Composable
+private fun CadastroForm(
+    onNavigateToLogin: () -> Unit,
+    onCadastroSuccess: () -> Unit,
+    isDesktop: Boolean
 ) {
     val viewModel = remember { CadastroViewModel() }
     val formState by viewModel.formState.collectAsState()
@@ -42,418 +141,400 @@ fun CadastroScreen(
 
     val funcoes = listOf("Agente de Campo", "Supervisor")
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(GeoSaudeColors.Background)
-            .verticalScroll(rememberScrollState()),
-        contentAlignment = Alignment.Center
+            .padding(horizontal = if (isDesktop) 32.dp else 28.dp, vertical = 24.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(12.dp) // Reduzido de 20dp para 12dp
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
-                .widthIn(max = 400.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(32.dp),
-                    spotColor = GeoSaudeColors.Primary.copy(alpha = 0.1f)
-                ),
-            shape = RoundedCornerShape(32.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = GeoSaudeColors.CardBackground
-            )
+        // Header
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Column(
+            Text(
+                text = buildAnnotatedString {
+                    append("Bem vindo ao ")
+                    withStyle(
+                        SpanStyle(
+                            color = GeoSaudeColors.Primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    ) {
+                        append("GeoSaúde")
+                    }
+                },
+                fontSize = 15.sp,
+                color = GeoSaudeColors.TextPrimary
+            )
+
+            Text(
+                text = "Cadastre-se",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = GeoSaudeColors.TextPrimary
+            )
+
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 28.dp, vertical = 40.dp),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                    .padding(top = 2.dp),
+                horizontalArrangement = Arrangement.End
             ) {
-                // Header
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.Start
-                ) {
+                Text(
+                    text = "Já tem uma conta? ",
+                    fontSize = 12.sp,
+                    color = GeoSaudeColors.TextSecondary
+                )
+                Text(
+                    text = "Faça login",
+                    fontSize = 12.sp,
+                    color = GeoSaudeColors.Primary,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.clickable { onNavigateToLogin() }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Linha 1: Matrícula + Função
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            // Campo: Matrícula
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "Preencha com sua matrícula",
+                    fontSize = 13.sp,
+                    color = GeoSaudeColors.TextPrimary,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.height(32.dp) // Altura fixa para alinhar
+                )
+
+                OutlinedTextField(
+                    value = formState.matricula,
+                    onValueChange = { viewModel.onMatriculaChange(it) },
+                    placeholder = {
+                        Text("123456789", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp), // Aumentado de 48dp para 52dp
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = GeoSaudeColors.Primary,
+                        unfocusedBorderColor = GeoSaudeColors.InputBorder,
+                        focusedContainerColor = GeoSaudeColors.White,
+                        unfocusedContainerColor = GeoSaudeColors.White
+                    ),
+                    isError = formState.matriculaError != null
+                )
+
+                if (formState.matriculaError != null) {
                     Text(
-                        text = buildAnnotatedString {
-                            append("Bem vindo ao ")
-                            withStyle(SpanStyle(color = GeoSaudeColors.Primary, fontWeight = FontWeight.SemiBold)) {
-                                append("GeoSaúde")
+                        text = formState.matriculaError!!,
+                        color = GeoSaudeColors.Error,
+                        fontSize = 10.sp
+                    )
+                }
+            }
+
+            // Campo: Função
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "Qual sua função?",
+                    fontSize = 13.sp,
+                    color = GeoSaudeColors.TextPrimary,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.height(32.dp) // Altura fixa para alinhar
+                )
+
+                Box {
+                    OutlinedTextField(
+                        value = formState.funcao,
+                        onValueChange = {},
+                        placeholder = {
+                            Text("-", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                        },
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showFuncaoDropdown = !showFuncaoDropdown }) {
+                                Icon(
+                                    Icons.Default.ArrowDropDown,
+                                    contentDescription = null,
+                                    tint = GeoSaudeColors.Gray600
+                                )
                             }
                         },
-                        fontSize = 16.sp,
-                        color = GeoSaudeColors.TextPrimary
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Cadastre-se",
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = GeoSaudeColors.TextPrimary
-                    )
-
-                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 4.dp),
-                        horizontalArrangement = Arrangement.End
+                            .height(52.dp), // Aumentado de 48dp para 52dp
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledBorderColor = GeoSaudeColors.InputBorder,
+                            disabledContainerColor = GeoSaudeColors.White,
+                            disabledTextColor = GeoSaudeColors.TextPrimary
+                        ),
+                        enabled = false,
+                        isError = formState.funcaoError != null
+                    )
+
+                    DropdownMenu(
+                        expanded = showFuncaoDropdown,
+                        onDismissRequest = { showFuncaoDropdown = false }
                     ) {
-                        Text(
-                            text = "Já tem uma conta? ",
-                            fontSize = 13.sp,
-                            color = GeoSaudeColors.TextSecondary
-                        )
-                        Text(
-                            text = "Faça login",
-                            fontSize = 13.sp,
-                            color = GeoSaudeColors.Primary,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.clickable { onNavigateToLogin() }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Linha 1: Matrícula + Função
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.Top
-                ) {
-                    // Campo: Matrícula
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Preencha com sua matrícula",
-                            fontSize = 14.sp,
-                            color = GeoSaudeColors.TextPrimary,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.height(36.dp),
-                            lineHeight = 18.sp
-                        )
-
-                        OutlinedTextField(
-                            value = formState.matricula,
-                            onValueChange = { viewModel.onMatriculaChange(it) },
-                            placeholder = {
-                                Text(
-                                    "123456789",
-                                    color = GeoSaudeColors.Gray400,
-                                    fontSize = 14.sp
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = GeoSaudeColors.Primary,
-                                unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                                focusedContainerColor = GeoSaudeColors.White,
-                                unfocusedContainerColor = GeoSaudeColors.White
-                            ),
-                            isError = formState.matriculaError != null
-                        )
-
-                        if (formState.matriculaError != null) {
-                            Text(
-                                text = formState.matriculaError!!,
-                                color = GeoSaudeColors.Error,
-                                fontSize = 11.sp
-                            )
-                        }
-                    }
-
-                    // Campo: Função
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Qual sua função?",
-                            fontSize = 14.sp,
-                            color = GeoSaudeColors.TextPrimary,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.height(36.dp),
-                            lineHeight = 18.sp
-                        )
-
-                        Box {
-                            OutlinedTextField(
-                                value = formState.funcao,
-                                onValueChange = {},
-                                placeholder = {
-                                    Text("-", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                                },
-                                readOnly = true,
-                                trailingIcon = {
-                                    IconButton(onClick = { showFuncaoDropdown = !showFuncaoDropdown }) {
-                                        Icon(
-                                            Icons.Default.ArrowDropDown,
-                                            contentDescription = null,
-                                            tint = GeoSaudeColors.Gray600
-                                        )
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    disabledBorderColor = GeoSaudeColors.InputBorder,
-                                    disabledContainerColor = GeoSaudeColors.White,
-                                    disabledTextColor = GeoSaudeColors.TextPrimary
-                                ),
-                                enabled = false,
-                                isError = formState.funcaoError != null
-                            )
-
-                            DropdownMenu(
-                                expanded = showFuncaoDropdown,
-                                onDismissRequest = { showFuncaoDropdown = false }
-                            ) {
-                                funcoes.forEach { funcao ->
-                                    DropdownMenuItem(
-                                        text = { Text(funcao, fontSize = 14.sp) },
-                                        onClick = {
-                                            viewModel.onFuncaoChange(funcao)
-                                            showFuncaoDropdown = false
-                                        }
-                                    )
+                        funcoes.forEach { funcao ->
+                            DropdownMenuItem(
+                                text = { Text(funcao, fontSize = 14.sp) },
+                                onClick = {
+                                    viewModel.onFuncaoChange(funcao)
+                                    showFuncaoDropdown = false
                                 }
-                            }
-                        }
-
-                        if (formState.funcaoError != null) {
-                            Text(
-                                text = formState.funcaoError!!,
-                                color = GeoSaudeColors.Error,
-                                fontSize = 11.sp
                             )
                         }
                     }
                 }
 
-                // Campo: Nome completo
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                if (formState.funcaoError != null) {
                     Text(
-                        text = "Preencha com seu nome completo",
-                        fontSize = 14.sp,
-                        color = GeoSaudeColors.TextPrimary,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    OutlinedTextField(
-                        value = formState.nomeCompleto,
-                        onValueChange = { viewModel.onNomeCompletoChange(it) },
-                        placeholder = {
-                            Text("Nome completo", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GeoSaudeColors.Primary,
-                            unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                            focusedContainerColor = GeoSaudeColors.White,
-                            unfocusedContainerColor = GeoSaudeColors.White
-                        ),
-                        isError = formState.nomeCompletoError != null
-                    )
-
-                    if (formState.nomeCompletoError != null) {
-                        Text(
-                            text = formState.nomeCompletoError!!,
-                            color = GeoSaudeColors.Error,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                // Campo: E-mail
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "E-mail",
-                        fontSize = 14.sp,
-                        color = GeoSaudeColors.TextPrimary,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    OutlinedTextField(
-                        value = formState.email,
-                        onValueChange = { viewModel.onEmailChange(it) },
-                        placeholder = {
-                            Text("E-mail", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GeoSaudeColors.Primary,
-                            unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                            focusedContainerColor = GeoSaudeColors.White,
-                            unfocusedContainerColor = GeoSaudeColors.White
-                        ),
-                        isError = formState.emailError != null
-                    )
-
-                    if (formState.emailError != null) {
-                        Text(
-                            text = formState.emailError!!,
-                            color = GeoSaudeColors.Error,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                // Campo: Senha
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Crie uma senha",
-                        fontSize = 14.sp,
-                        color = GeoSaudeColors.TextPrimary,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    OutlinedTextField(
-                        value = formState.senha,
-                        onValueChange = { viewModel.onSenhaChange(it) },
-                        placeholder = {
-                            Text("Senha", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                        },
-                        visualTransformation = if (senhaVisivel) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { senhaVisivel = !senhaVisivel }) {
-                                Icon(
-                                    imageVector = if (senhaVisivel) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = null,
-                                    tint = GeoSaudeColors.Gray400
-                                )
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GeoSaudeColors.Primary,
-                            unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                            focusedContainerColor = GeoSaudeColors.White,
-                            unfocusedContainerColor = GeoSaudeColors.White
-                        ),
-                        isError = formState.senhaError != null
-                    )
-
-                    if (formState.senhaError != null) {
-                        Text(
-                            text = formState.senhaError!!,
-                            color = GeoSaudeColors.Error,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                // Campo: Confirmar senha
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Digite a senha novamente",
-                        fontSize = 14.sp,
-                        color = GeoSaudeColors.TextPrimary,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    OutlinedTextField(
-                        value = formState.confirmarSenha,
-                        onValueChange = { viewModel.onConfirmarSenhaChange(it) },
-                        placeholder = {
-                            Text("Senha", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                        },
-                        visualTransformation = if (confirmarSenhaVisivel) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { confirmarSenhaVisivel = !confirmarSenhaVisivel }) {
-                                Icon(
-                                    imageVector = if (confirmarSenhaVisivel) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                    contentDescription = null,
-                                    tint = GeoSaudeColors.Gray400
-                                )
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GeoSaudeColors.Primary,
-                            unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                            focusedContainerColor = GeoSaudeColors.White,
-                            unfocusedContainerColor = GeoSaudeColors.White
-                        ),
-                        isError = formState.confirmarSenhaError != null
-                    )
-
-                    if (formState.confirmarSenhaError != null) {
-                        Text(
-                            text = formState.confirmarSenhaError!!,
-                            color = GeoSaudeColors.Error,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (errorMessage != null) {
-                    Text(
-                        text = errorMessage!!,
+                        text = formState.funcaoError!!,
                         color = GeoSaudeColors.Error,
-                        fontSize = 14.sp,
-                        modifier = Modifier.fillMaxWidth()
+                        fontSize = 10.sp
                     )
                 }
+            }
+        }
 
-                // Botão Cadastrar
-                Button(
-                    onClick = {
-                        errorMessage = null
-                        viewModel.onCadastrar(
-                            onSuccess = onCadastroSuccess,
-                            onError = { errorMessage = it }
+        // Campo: Nome completo
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "Preencha com seu nome completo",
+                fontSize = 13.sp,
+                color = GeoSaudeColors.TextPrimary,
+                fontWeight = FontWeight.Medium
+            )
+
+            OutlinedTextField(
+                value = formState.nomeCompleto,
+                onValueChange = { viewModel.onNomeCompletoChange(it) },
+                placeholder = {
+                    Text("Nome completo", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = GeoSaudeColors.Primary,
+                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
+                    focusedContainerColor = GeoSaudeColors.White,
+                    unfocusedContainerColor = GeoSaudeColors.White
+                ),
+                isError = formState.nomeCompletoError != null
+            )
+
+            if (formState.nomeCompletoError != null) {
+                Text(
+                    text = formState.nomeCompletoError!!,
+                    color = GeoSaudeColors.Error,
+                    fontSize = 10.sp
+                )
+            }
+        }
+
+        // Campo: E-mail
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "E-mail",
+                fontSize = 13.sp,
+                color = GeoSaudeColors.TextPrimary,
+                fontWeight = FontWeight.Medium
+            )
+
+            OutlinedTextField(
+                value = formState.email,
+                onValueChange = { viewModel.onEmailChange(it) },
+                placeholder = {
+                    Text("E-mail", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = GeoSaudeColors.Primary,
+                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
+                    focusedContainerColor = GeoSaudeColors.White,
+                    unfocusedContainerColor = GeoSaudeColors.White
+                ),
+                isError = formState.emailError != null
+            )
+
+            if (formState.emailError != null) {
+                Text(
+                    text = formState.emailError!!,
+                    color = GeoSaudeColors.Error,
+                    fontSize = 10.sp
+                )
+            }
+        }
+
+        // Campo: Senha
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "Crie uma senha",
+                fontSize = 13.sp,
+                color = GeoSaudeColors.TextPrimary,
+                fontWeight = FontWeight.Medium
+            )
+
+            OutlinedTextField(
+                value = formState.senha,
+                onValueChange = { viewModel.onSenhaChange(it) },
+                placeholder = {
+                    Text("Senha", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                },
+                visualTransformation = if (senhaVisivel) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { senhaVisivel = !senhaVisivel }) {
+                        Icon(
+                            imageVector = if (senhaVisivel) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
+                            tint = GeoSaudeColors.Gray400
                         )
-                    },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    enabled = !formState.isLoading,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = GeoSaudeColors.Primary,
-                        disabledContainerColor = GeoSaudeColors.Primary.copy(alpha = 0.6f)
-                    )
-                ) {
-                    if (formState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = GeoSaudeColors.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text("Cadastrar", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = GeoSaudeColors.Primary,
+                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
+                    focusedContainerColor = GeoSaudeColors.White,
+                    unfocusedContainerColor = GeoSaudeColors.White
+                ),
+                isError = formState.senhaError != null
+            )
+
+            if (formState.senhaError != null) {
+                Text(
+                    text = formState.senhaError!!,
+                    color = GeoSaudeColors.Error,
+                    fontSize = 10.sp
+                )
+            }
+        }
+
+        // Campo: Confirmar senha
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "Digite a senha novamente",
+                fontSize = 13.sp,
+                color = GeoSaudeColors.TextPrimary,
+                fontWeight = FontWeight.Medium
+            )
+
+            OutlinedTextField(
+                value = formState.confirmarSenha,
+                onValueChange = { viewModel.onConfirmarSenhaChange(it) },
+                placeholder = {
+                    Text("Senha", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                },
+                visualTransformation = if (confirmarSenhaVisivel) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { confirmarSenhaVisivel = !confirmarSenhaVisivel }) {
+                        Icon(
+                            imageVector = if (confirmarSenhaVisivel) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null,
+                            tint = GeoSaudeColors.Gray400
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = GeoSaudeColors.Primary,
+                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
+                    focusedContainerColor = GeoSaudeColors.White,
+                    unfocusedContainerColor = GeoSaudeColors.White
+                ),
+                isError = formState.confirmarSenhaError != null
+            )
+
+            if (formState.confirmarSenhaError != null) {
+                Text(
+                    text = formState.confirmarSenhaError!!,
+                    color = GeoSaudeColors.Error,
+                    fontSize = 10.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = GeoSaudeColors.Error,
+                fontSize = 12.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Botão Cadastrar
+        Button(
+            onClick = {
+                errorMessage = null
+                viewModel.onCadastrar(
+                    onSuccess = onCadastroSuccess,
+                    onError = { errorMessage = it }
+                )
+            },
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            enabled = !formState.isLoading,
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = GeoSaudeColors.Primary,
+                disabledContainerColor = GeoSaudeColors.Primary.copy(alpha = 0.6f)
+            )
+        ) {
+            if (formState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(22.dp),
+                    color = GeoSaudeColors.White,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Cadastrar", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
             }
         }
     }

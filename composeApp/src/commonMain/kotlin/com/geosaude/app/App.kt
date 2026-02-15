@@ -1,12 +1,12 @@
 package com.geosaude.app
 
 import androidx.compose.runtime.Composable
-import com.geosaude.app.navigation.NavGraph
-import com.geosaude.app.ui.theme.GeoSaudeTheme
 
+// Este arquivo é substituído pelas versões específicas de cada plataforma:
+// - androidMain/App.kt (usa NavController - Android only)
+// - jvmMain/App.kt (usa state simples - Desktop)
+// - iosMain/App.kt (quando implementarmos iOS)
+
+// FUNÇÃO EXPECT/ACTUAL PATTERN (alternativa)
 @Composable
-fun App() {
-    GeoSaudeTheme {
-        NavGraph()
-    }
-}
+expect fun App()

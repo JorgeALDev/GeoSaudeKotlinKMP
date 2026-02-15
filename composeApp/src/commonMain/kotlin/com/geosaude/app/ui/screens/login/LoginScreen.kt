@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.geosaude.app.ui.components.IllustrationSection
 import com.geosaude.app.ui.theme.GeoSaudeColors
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.width
 
 @Composable
 fun LoginScreen(
@@ -59,12 +61,18 @@ private fun LoginScreenDesktop(
     onLoginSuccess: (String) -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
-        // Lado esquerdo: Ilustração
-        Box(modifier = Modifier.weight(1f)) {
+        // Lado esquerdo: Ilustração (50%)
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .background(GeoSaudeColors.Background),
+            contentAlignment = Alignment.Center
+        ) {
             IllustrationSection()
         }
 
-        // Lado direito: Formulário
+        // Lado direito: Formulário (50%)
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -72,12 +80,27 @@ private fun LoginScreenDesktop(
                 .background(GeoSaudeColors.White),
             contentAlignment = Alignment.Center
         ) {
-            LoginForm(
-                onNavigateToCadastro = onNavigateToCadastro,
-                onNavigateToRecuperarSenha = onNavigateToRecuperarSenha,
-                onLoginSuccess = onLoginSuccess,
-                isDesktop = true
-            )
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 480.dp)
+                    .padding(48.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(24.dp),
+                        spotColor = GeoSaudeColors.Primary.copy(alpha = 0.1f)
+                    ),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = GeoSaudeColors.CardBackground
+                )
+            ) {
+                LoginForm(
+                    onNavigateToCadastro = onNavigateToCadastro,
+                    onNavigateToRecuperarSenha = onNavigateToRecuperarSenha,
+                    onLoginSuccess = onLoginSuccess,
+                    isDesktop = true
+                )
+            }
         }
     }
 }
@@ -306,7 +329,7 @@ private fun LoginForm(
                 fontWeight = FontWeight.Medium
             )
 
-            Box {
+            Box(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = funcaoSelecionada,
                     onValueChange = {},
@@ -336,15 +359,24 @@ private fun LoginForm(
                 DropdownMenu(
                     expanded = showFuncaoDropdown,
                     onDismissRequest = { showFuncaoDropdown = false },
-                    modifier = Modifier.fillMaxWidth(0.85f)
+                    modifier = Modifier
+                        .width(IntrinsicSize.Max)
+                        .widthIn(min = 250.dp, max = 400.dp)
                 ) {
                     funcoes.forEach { funcao ->
                         DropdownMenuItem(
-                            text = { Text(funcao, fontSize = 14.sp) },
+                            text = {
+                                Text(
+                                    funcao,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            },
                             onClick = {
                                 funcaoSelecionada = funcao
                                 showFuncaoDropdown = false
-                            }
+                            },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
