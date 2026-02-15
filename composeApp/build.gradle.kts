@@ -1,5 +1,4 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,6 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 kotlin {
@@ -16,7 +16,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -26,41 +26,84 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm()
-    
+
     js {
         browser()
         binaries.executable()
     }
-    
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        binaries.executable()
-    }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+
+            // Ktor Android
+            implementation("io.ktor:ktor-client-android:2.3.12")
+
+            // DataStore Android
+            implementation("androidx.datastore:datastore-preferences:1.1.1")
         }
+
         commonMain.dependencies {
+            // Compose
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
+
+            // ✅ ÍCONES MATERIAL
+            implementation("org.jetbrains.compose.material:material-icons-extended:1.7.1")
+
+            // Lifecycle
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            // NAVEGAÇÃO
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+
+            // KTOR (HTTP Client)
+            implementation("io.ktor:ktor-client-core:2.3.12")
+            implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
+            implementation("io.ktor:ktor-client-logging:2.3.12")
+
+            // SERIALIZAÇÃO
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+            // COROUTINES
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
+            // DATETIME
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+
+            // Ktor JVM
+            implementation("io.ktor:ktor-client-cio:2.3.12")
+
+            // DataStore JVM
+            implementation("androidx.datastore:datastore-preferences:1.1.1")
+        }
+
+        iosMain.dependencies {
+            // Ktor iOS
+            implementation("io.ktor:ktor-client-darwin:2.3.12")
+        }
+
+        jsMain.dependencies {
+            // Ktor JS
+            implementation("io.ktor:ktor-client-js:2.3.12")
         }
     }
 }
@@ -101,7 +144,7 @@ compose.desktop {
         mainClass = "com.geosaude.app.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Exe, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.geosaude.app"
             packageVersion = "1.0.0"
         }
