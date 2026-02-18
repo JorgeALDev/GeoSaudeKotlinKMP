@@ -55,7 +55,7 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.compose.uiToolingPreview)
 
-            // ✅ ÍCONES MATERIAL
+            // ÍCONES MATERIAL
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.1")
 
             // Lifecycle
@@ -79,6 +79,10 @@ kotlin {
 
             // DATETIME
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+
+            // KOIN - Injeção de Dependências
+            implementation("io.insert-koin:koin-core:3.5.3")
+            implementation("io.insert-koin:koin-compose:1.1.2")
         }
 
         commonTest.dependencies {

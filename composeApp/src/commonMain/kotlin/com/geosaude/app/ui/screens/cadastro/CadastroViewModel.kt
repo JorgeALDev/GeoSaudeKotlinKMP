@@ -3,6 +3,7 @@ package com.geosaude.app.ui.screens.cadastro
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geosaude.app.domain.model.CadastroFormState
+import com.geosaude.app.domain.validation.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +15,6 @@ class CadastroViewModel : ViewModel() {
     val formState: StateFlow<CadastroFormState> = _formState.asStateFlow()
 
     fun onMatriculaChange(value: String) {
-        // Permitir apenas números, máximo 8 dígitos
         val filtered = value.filter { it.isDigit() }.take(8)
         _formState.value = _formState.value.copy(
             matricula = filtered,
@@ -38,7 +38,7 @@ class CadastroViewModel : ViewModel() {
 
     fun onEmailChange(value: String) {
         _formState.value = _formState.value.copy(
-            email = value,
+            email = value.trim(),
             emailError = null
         )
     }
@@ -57,75 +57,53 @@ class CadastroViewModel : ViewModel() {
         )
     }
 
-    fun onCadastrar(onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun onCadastrar(
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
-            // Validações
-            if (!validarFormulario()) {
+            _formState.value = _formState.value.copy(isLoading = true)
+
+            // Validar todos os campos
+            val matriculaValidation = MatriculaValidator.validate(_formState.value.matricula)
+            val funcaoValidation = FuncaoValidator.validate(_formState.value.funcao)
+            val nomeValidation = NomeValidator.validate(_formState.value.nomeCompleto)
+            val emailValidation = EmailValidator.validate(_formState.value.email)
+            val senhaValidation = SenhaValidator.validate(_formState.value.senha)
+            val confirmacaoValidation = SenhaValidator.validateConfirmation(
+                _formState.value.senha,
+                _formState.value.confirmarSenha
+            )
+
+            // Coletar erros
+            val hasErrors = listOf(
+                matriculaValidation,
+                funcaoValidation,
+                nomeValidation,
+                emailValidation,
+                senhaValidation,
+                confirmacaoValidation
+            ).any { it !is ValidationResult.Success }
+
+            if (hasErrors) {
+                _formState.value = _formState.value.copy(
+                    matriculaError = (matriculaValidation as? ValidationResult.Error)?.message,
+                    funcaoError = (funcaoValidation as? ValidationResult.Error)?.message,
+                    nomeCompletoError = (nomeValidation as? ValidationResult.Error)?.message,
+                    emailError = (emailValidation as? ValidationResult.Error)?.message,
+                    senhaError = (senhaValidation as? ValidationResult.Error)?.message,
+                    confirmarSenhaError = (confirmacaoValidation as? ValidationResult.Error)?.message,
+                    isLoading = false
+                )
                 return@launch
             }
 
-            _formState.value = _formState.value.copy(isLoading = true)
+            // TODO: Integrar com API real
+            kotlinx.coroutines.delay(1500)
 
-            // TODO: Implementar cadastro real
-            kotlinx.coroutines.delay(1500) // Simular chamada de API
-
+            // Cadastro bem-sucedido
             _formState.value = _formState.value.copy(isLoading = false)
             onSuccess()
         }
-    }
-
-    private fun validarFormulario(): Boolean {
-        var isValid = true
-
-        // Validar matrícula (6-8 dígitos)
-        if (_formState.value.matricula.length !in 6..8) {
-            _formState.value = _formState.value.copy(
-                matriculaError = "Matrícula deve ter entre 6 e 8 dígitos"
-            )
-            isValid = false
-        }
-
-        // Validar função
-        if (_formState.value.funcao.isBlank()) {
-            _formState.value = _formState.value.copy(
-                funcaoError = "Selecione uma função"
-            )
-            isValid = false
-        }
-
-        // Validar nome completo (mínimo 3 caracteres)
-        if (_formState.value.nomeCompleto.length < 3) {
-            _formState.value = _formState.value.copy(
-                nomeCompletoError = "Nome deve ter no mínimo 3 caracteres"
-            )
-            isValid = false
-        }
-
-        // Validar email (regex simples)
-        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
-        if (!_formState.value.email.matches(emailRegex)) {
-            _formState.value = _formState.value.copy(
-                emailError = "E-mail inválido"
-            )
-            isValid = false
-        }
-
-        // Validar senha (mínimo 6 caracteres)
-        if (_formState.value.senha.length < 6) {
-            _formState.value = _formState.value.copy(
-                senhaError = "Senha deve ter no mínimo 6 caracteres"
-            )
-            isValid = false
-        }
-
-        // Validar confirmação de senha
-        if (_formState.value.senha != _formState.value.confirmarSenha) {
-            _formState.value = _formState.value.copy(
-                confirmarSenhaError = "As senhas não coincidem"
-            )
-            isValid = false
-        }
-
-        return isValid
     }
 }

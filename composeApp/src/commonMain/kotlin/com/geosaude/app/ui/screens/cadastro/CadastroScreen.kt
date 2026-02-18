@@ -3,10 +3,8 @@ package com.geosaude.app.ui.screens.cadastro
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Visibility
@@ -26,7 +24,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.geosaude.app.ui.components.IllustrationSection
+import com.geosaude.app.ui.components.LogoHeader
 import com.geosaude.app.ui.theme.GeoSaudeColors
+import org.koin.compose.koinInject
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 
 @Composable
 fun CadastroScreen(
@@ -56,7 +58,6 @@ private fun CadastroScreenDesktop(
     onCadastroSuccess: () -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
-        // Lado esquerdo: Ilustração (50%)
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -67,29 +68,39 @@ private fun CadastroScreenDesktop(
             IllustrationSection()
         }
 
-        // Lado direito: Formulário (50%)
-        Box(
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(GeoSaudeColors.White),
-            contentAlignment = Alignment.Center
+                .background(GeoSaudeColors.White)
         ) {
-            Card(
-                modifier = Modifier
-                    .widthIn(max = 520.dp)
-                    .fillMaxHeight(0.95f) // 95% da altura
-                    .padding(horizontal = 48.dp, vertical = 24.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = GeoSaudeColors.CardBackground
-                )
+            LogoHeader(backgroundColor = GeoSaudeColors.White)
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                CadastroForm(
-                    onNavigateToLogin = onNavigateToLogin,
-                    onCadastroSuccess = onCadastroSuccess,
-                    isDesktop = true
-                )
+                Card(
+                    modifier = Modifier
+                        .widthIn(max = 520.dp)
+                        .fillMaxHeight(0.97f)
+                        .padding(horizontal = 48.dp, vertical = 20.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(24.dp),
+                            spotColor = GeoSaudeColors.Primary.copy(alpha = 0.1f)
+                        ),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = GeoSaudeColors.CardBackground
+                    )
+                ) {
+                    CadastroForm(
+                        onNavigateToLogin = onNavigateToLogin,
+                        onCadastroSuccess = onCadastroSuccess,
+                        isDesktop = true
+                    )
+                }
             }
         }
     }
@@ -100,27 +111,38 @@ private fun CadastroScreenMobile(
     onNavigateToLogin: () -> Unit,
     onCadastroSuccess: () -> Unit
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(GeoSaudeColors.Background),
-        contentAlignment = Alignment.Center
+            .background(GeoSaudeColors.Background)
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.95f) // 95% da altura
-                .padding(24.dp),
-            shape = RoundedCornerShape(32.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = GeoSaudeColors.CardBackground
-            )
+        LogoHeader(backgroundColor = GeoSaudeColors.Background)
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            CadastroForm(
-                onNavigateToLogin = onNavigateToLogin,
-                onCadastroSuccess = onCadastroSuccess,
-                isDesktop = false
-            )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(1.0f)
+                    .padding(24.dp)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(32.dp),
+                        spotColor = GeoSaudeColors.Primary.copy(alpha = 0.1f)
+                    ),
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = GeoSaudeColors.CardBackground
+                )
+            ) {
+                CadastroForm(
+                    onNavigateToLogin = onNavigateToLogin,
+                    onCadastroSuccess = onCadastroSuccess,
+                    isDesktop = false
+                )
+            }
         }
     }
 }
@@ -131,7 +153,7 @@ private fun CadastroForm(
     onCadastroSuccess: () -> Unit,
     isDesktop: Boolean
 ) {
-    val viewModel = remember { CadastroViewModel() }
+    val viewModel = org.koin.compose.koinInject<CadastroViewModel>()
     val formState by viewModel.formState.collectAsState()
 
     var senhaVisivel by remember { mutableStateOf(false) }
@@ -143,12 +165,12 @@ private fun CadastroForm(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = if (isDesktop) 32.dp else 28.dp, vertical = 24.dp),
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = if (isDesktop) 32.dp else 28.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(12.dp) // Reduzido de 20dp para 12dp
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Header
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.Start,
@@ -198,15 +220,13 @@ private fun CadastroForm(
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
-        // Linha 1: Matrícula + Função
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.Top
         ) {
-            // Campo: Matrícula
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -218,7 +238,7 @@ private fun CadastroForm(
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
                     lineHeight = 16.sp,
-                    modifier = Modifier.height(32.dp) // Altura fixa para alinhar
+                    modifier = Modifier.height(28.dp)
                 )
 
                 OutlinedTextField(
@@ -228,9 +248,7 @@ private fun CadastroForm(
                         Text("123456789", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp), // Aumentado de 48dp para 52dp
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -251,7 +269,6 @@ private fun CadastroForm(
                 }
             }
 
-            // Campo: Função
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -263,7 +280,7 @@ private fun CadastroForm(
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
                     lineHeight = 16.sp,
-                    modifier = Modifier.height(32.dp) // Altura fixa para alinhar
+                    modifier = Modifier.height(28.dp)
                 )
 
                 Box {
@@ -275,7 +292,9 @@ private fun CadastroForm(
                         },
                         readOnly = true,
                         trailingIcon = {
-                            IconButton(onClick = { showFuncaoDropdown = !showFuncaoDropdown }) {
+                            IconButton(onClick = {
+                                showFuncaoDropdown = !showFuncaoDropdown
+                            }) {
                                 Icon(
                                     Icons.Default.ArrowDropDown,
                                     contentDescription = null,
@@ -283,9 +302,7 @@ private fun CadastroForm(
                                 )
                             }
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp), // Aumentado de 48dp para 52dp
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             disabledBorderColor = GeoSaudeColors.InputBorder,
@@ -322,7 +339,6 @@ private fun CadastroForm(
             }
         }
 
-        // Campo: Nome completo
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -361,7 +377,6 @@ private fun CadastroForm(
             }
         }
 
-        // Campo: E-mail
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -401,7 +416,6 @@ private fun CadastroForm(
             }
         }
 
-        // Campo: Senha
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -450,13 +464,12 @@ private fun CadastroForm(
             }
         }
 
-        // Campo: Confirmar senha
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
-                text = "Digite a senha novamente",
+                text = "Confirme sua senha",
                 fontSize = 13.sp,
                 color = GeoSaudeColors.TextPrimary,
                 fontWeight = FontWeight.Medium
@@ -470,7 +483,9 @@ private fun CadastroForm(
                 },
                 visualTransformation = if (confirmarSenhaVisivel) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { confirmarSenhaVisivel = !confirmarSenhaVisivel }) {
+                    IconButton(onClick = {
+                        confirmarSenhaVisivel = !confirmarSenhaVisivel
+                    }) {
                         Icon(
                             imageVector = if (confirmarSenhaVisivel) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = null,
@@ -499,7 +514,7 @@ private fun CadastroForm(
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
         if (errorMessage != null) {
             Text(
@@ -510,7 +525,6 @@ private fun CadastroForm(
             )
         }
 
-        // Botão Cadastrar
         Button(
             onClick = {
                 errorMessage = null
@@ -519,7 +533,7 @@ private fun CadastroForm(
                     onError = { errorMessage = it }
                 )
             },
-            modifier = Modifier.fillMaxWidth().height(50.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
             enabled = !formState.isLoading,
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(

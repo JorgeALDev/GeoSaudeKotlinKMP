@@ -3,6 +3,9 @@ package com.geosaude.app.ui.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geosaude.app.domain.model.LoginFormState
+import com.geosaude.app.domain.validation.MatriculaValidator
+import com.geosaude.app.domain.validation.SenhaValidator
+import com.geosaude.app.domain.validation.ValidationResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,58 +32,42 @@ class LoginViewModel : ViewModel() {
         )
     }
 
-    fun onLogin(onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    fun onLogin(
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
         viewModelScope.launch {
-            // Validações
-            if (!validarFormulario()) {
-                return@launch
-            }
-
             _formState.value = _formState.value.copy(isLoading = true)
 
-            // TODO: Implementar lógica de login real
-            // Por enquanto, mock simples
-            kotlinx.coroutines.delay(1000) // Simular chamada de API
-
-            // Mock: Supervisor
-            if (_formState.value.matricula == "123456" && _formState.value.senha == "Admin123") {
-                _formState.value = _formState.value.copy(isLoading = false)
-                onSuccess("supervisor")
+            // Validar matrícula
+            val matriculaValidation = MatriculaValidator.validate(_formState.value.matricula)
+            if (matriculaValidation !is ValidationResult.Success) {
+                _formState.value = _formState.value.copy(
+                    matriculaError = (matriculaValidation as ValidationResult.Error).message,
+                    isLoading = false
+                )
                 return@launch
             }
 
-            // Mock: Agente
-            if (_formState.value.matricula == "789012" && _formState.value.senha == "Agente123") {
-                _formState.value = _formState.value.copy(isLoading = false)
-                onSuccess("agent")
+            // Validar senha
+            val senhaValidation = SenhaValidator.validate(_formState.value.senha)
+            if (senhaValidation !is ValidationResult.Success) {
+                _formState.value = _formState.value.copy(
+                    senhaError = (senhaValidation as ValidationResult.Error).message,
+                    isLoading = false
+                )
                 return@launch
             }
 
-            // Erro
+            // TODO: Integrar com API real
+            // A API deve retornar a função do usuário baseado na matrícula
+
+            // Simulação de login
+            kotlinx.coroutines.delay(1000)
+
+            // Login bem-sucedido
             _formState.value = _formState.value.copy(isLoading = false)
-            onError("Matrícula ou senha incorretos")
+            onSuccess("agente_de_campo")
         }
-    }
-
-    private fun validarFormulario(): Boolean {
-        var isValid = true
-
-        // Validar matrícula (6-8 dígitos)
-        if (_formState.value.matricula.length !in 6..8) {
-            _formState.value = _formState.value.copy(
-                matriculaError = "Matrícula deve ter entre 6 e 8 dígitos"
-            )
-            isValid = false
-        }
-
-        // Validar senha (não vazia)
-        if (_formState.value.senha.isBlank()) {
-            _formState.value = _formState.value.copy(
-                senhaError = "Senha é obrigatória"
-            )
-            isValid = false
-        }
-
-        return isValid
     }
 }
