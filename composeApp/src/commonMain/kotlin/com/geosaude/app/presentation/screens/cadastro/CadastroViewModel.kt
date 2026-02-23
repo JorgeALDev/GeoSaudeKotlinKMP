@@ -1,4 +1,4 @@
-package com.geosaude.app.ui.screens.cadastro
+package com.geosaude.app.presentation.screens.cadastro
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

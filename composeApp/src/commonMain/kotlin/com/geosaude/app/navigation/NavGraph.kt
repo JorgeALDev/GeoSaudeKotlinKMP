@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.geosaude.app.ui.screens.login.LoginScreen
-import com.geosaude.app.ui.screens.cadastro.CadastroScreen
+import com.geosaude.app.presentation.screens.login.LoginScreen
+import com.geosaude.app.presentation.screens.cadastro.CadastroScreen
 
 @Composable
 fun NavGraph() {

@@ -1,4 +1,4 @@
-package com.geosaude.app.ui.screens.login
+package com.geosaude.app.presentation.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

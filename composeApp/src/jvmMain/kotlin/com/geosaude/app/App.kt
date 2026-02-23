@@ -1,10 +1,9 @@
 package com.geosaude.app
 
 import androidx.compose.runtime.*
-import com.geosaude.app.ui.screens.login.LoginScreen
-import com.geosaude.app.ui.screens.cadastro.CadastroScreen
-import com.geosaude.app.ui.theme.GeoSaudeTheme
-import androidx.compose.foundation.layout.BoxWithConstraints
+import com.geosaude.app.presentation.screens.login.LoginScreen
+import com.geosaude.app.presentation.screens.cadastro.CadastroScreen
+import com.geosaude.app.presentation.theme.GeoSaudeTheme
 
 @Composable
 actual fun App() {

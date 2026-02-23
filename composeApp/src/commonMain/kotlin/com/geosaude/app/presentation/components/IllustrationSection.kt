@@ -1,4 +1,4 @@
-package com.geosaude.app.ui.components
+package com.geosaude.app.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.geosaude.app.ui.theme.GeoSaudeColors
+import com.geosaude.app.presentation.theme.GeoSaudeColors
 import geosaude.composeapp.generated.resources.Res
 import geosaude.composeapp.generated.resources.illustration
 import org.jetbrains.compose.resources.painterResource

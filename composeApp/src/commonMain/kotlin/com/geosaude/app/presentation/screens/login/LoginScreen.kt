@@ -1,4 +1,4 @@
-package com.geosaude.app.ui.screens.login
+package com.geosaude.app.presentation.screens.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,10 +22,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.geosaude.app.ui.components.IllustrationSection
-import com.geosaude.app.ui.components.LogoHeader
-import com.geosaude.app.ui.theme.GeoSaudeColors
-import org.koin.compose.koinInject
+import com.geosaude.app.presentation.components.IllustrationSection
+import com.geosaude.app.presentation.components.LogoHeader
+import com.geosaude.app.presentation.theme.GeoSaudeColors
 
 @Composable
 fun LoginScreen(

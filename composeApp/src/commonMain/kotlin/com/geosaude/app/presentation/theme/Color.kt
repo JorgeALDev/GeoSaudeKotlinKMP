@@ -1,4 +1,4 @@
-package com.geosaude.app.ui.theme
+package com.geosaude.app.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
