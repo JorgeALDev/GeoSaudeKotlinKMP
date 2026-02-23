@@ -3,6 +3,7 @@ package com.geosaude.app
 import androidx.compose.runtime.*
 import com.geosaude.app.presentation.screens.login.LoginScreen
 import com.geosaude.app.presentation.screens.cadastro.CadastroScreen
+import com.geosaude.app.presentation.screens.main.MainScreen
 import com.geosaude.app.presentation.theme.GeoSaudeTheme
 
 @Composable
@@ -14,11 +15,14 @@ actual fun App() {
             "login" -> LoginScreen(
                 onNavigateToCadastro = { currentScreen = "cadastro" },
                 onNavigateToRecuperarSenha = { /* TODO */ },
-                onLoginSuccess = { /* TODO */ }
+                onLoginSuccess = { currentScreen = "main" }
             )
             "cadastro" -> CadastroScreen(
                 onNavigateToLogin = { currentScreen = "login" },
                 onCadastroSuccess = { currentScreen = "login" }
+            )
+            "main" -> MainScreen(
+                onLogout = { currentScreen = "login" }
             )
         }
     }
