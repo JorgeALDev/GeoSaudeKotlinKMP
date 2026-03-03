@@ -3,8 +3,10 @@ package com.geosaude.app.presentation.screens.cadastro
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Visibility
@@ -26,9 +28,18 @@ import androidx.compose.ui.unit.sp
 import com.geosaude.app.presentation.components.IllustrationSection
 import com.geosaude.app.presentation.components.LogoHeader
 import com.geosaude.app.presentation.theme.GeoSaudeColors
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 
+// ---------------------------------------------------------------------------
+// Ponto de entrada: layout responsivo Mobile/Desktop
+// ---------------------------------------------------------------------------
+
+/**
+ * Tela de cadastro com layout responsivo.
+ * Breakpoint de 800dp para alternar entre Mobile e Desktop.
+ *
+ * @param onNavigateToLogin Callback para voltar a tela de login.
+ * @param onCadastroSuccess Callback executado apos cadastro bem-sucedido.
+ */
 @Composable
 fun CadastroScreen(
     onNavigateToLogin: () -> Unit,
@@ -51,30 +62,44 @@ fun CadastroScreen(
     }
 }
 
+// ---------------------------------------------------------------------------
+// Layout Desktop (Frame 15 do Figma)
+// ---------------------------------------------------------------------------
+
+/**
+ * Layout desktop conforme Frame 15 do Figma:
+ * - Esquerda: fundo verde com logo no topo + ilustracao centralizada (sem textos).
+ * - Direita: fundo branco com formulario de cadastro em card.
+ */
 @Composable
 private fun CadastroScreenDesktop(
     onNavigateToLogin: () -> Unit,
     onCadastroSuccess: () -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
+        // Metade esquerda: ilustracao sem textos sobrepostos
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(GeoSaudeColors.Background),
-            contentAlignment = Alignment.Center
+                .background(GeoSaudeColors.Background)
         ) {
             IllustrationSection()
+
+            // Logo "GeoSaude" no topo esquerdo sobre a ilustracao
+            LogoHeader(
+                backgroundColor = GeoSaudeColors.Background,
+                modifier = Modifier.align(Alignment.TopStart)
+            )
         }
 
+        // Metade direita: formulario de cadastro
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
                 .background(GeoSaudeColors.White)
         ) {
-            LogoHeader(backgroundColor = GeoSaudeColors.White)
-
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -82,8 +107,9 @@ private fun CadastroScreenDesktop(
                 Card(
                     modifier = Modifier
                         .widthIn(max = 520.dp)
-                        .fillMaxHeight(0.97f)
-                        .padding(horizontal = 48.dp, vertical = 20.dp)
+                        .fillMaxWidth(0.9f)
+                        .wrapContentHeight()
+                        .padding(vertical = 24.dp)
                         .shadow(
                             elevation = 8.dp,
                             shape = RoundedCornerShape(24.dp),
@@ -105,6 +131,15 @@ private fun CadastroScreenDesktop(
     }
 }
 
+// ---------------------------------------------------------------------------
+// Layout Mobile (Figma Cadastro Mobile)
+// ---------------------------------------------------------------------------
+
+/**
+ * Layout mobile conforme Figma:
+ * - Logo "GeoSaude" no topo.
+ * - Card arredondado com formulario completo.
+ */
 @Composable
 private fun CadastroScreenMobile(
     onNavigateToLogin: () -> Unit,
@@ -119,19 +154,18 @@ private fun CadastroScreenMobile(
 
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopCenter
         ) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(1.0f)
-                    .padding(24.dp)
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
                     .shadow(
                         elevation = 8.dp,
-                        shape = RoundedCornerShape(32.dp),
+                        shape = RoundedCornerShape(24.dp),
                         spotColor = GeoSaudeColors.Primary.copy(alpha = 0.1f)
                     ),
-                shape = RoundedCornerShape(32.dp),
+                shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = GeoSaudeColors.CardBackground
                 )
@@ -146,6 +180,24 @@ private fun CadastroScreenMobile(
     }
 }
 
+// ---------------------------------------------------------------------------
+// Formulario de cadastro (compartilhado Mobile/Desktop)
+// ---------------------------------------------------------------------------
+
+/**
+ * Formulario de cadastro conforme Figma Frame 15 e Mobile.
+ * Campos na ordem do Figma:
+ * 1. Matricula + Funcao (lado a lado)
+ * 2. Nome completo
+ * 3. E-mail
+ * 4. Crie uma senha
+ * 5. Digite a senha novamente
+ * 6. Botao "Cadastrar"
+ *
+ * @param onNavigateToLogin Callback para navegar ao login.
+ * @param onCadastroSuccess Callback apos cadastro bem-sucedido.
+ * @param isDesktop Indica layout desktop (ajusta padding).
+ */
 @Composable
 private fun CadastroForm(
     onNavigateToLogin: () -> Unit,
@@ -166,96 +218,44 @@ private fun CadastroForm(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = if (isDesktop) 32.dp else 28.dp, vertical = 16.dp),
+            .padding(horizontal = if (isDesktop) 32.dp else 24.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text(
-                text = buildAnnotatedString {
-                    append("Bem vindo ao ")
-                    withStyle(
-                        SpanStyle(
-                            color = GeoSaudeColors.Primary,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    ) {
-                        append("GeoSaúde")
-                    }
-                },
-                fontSize = 15.sp,
-                color = GeoSaudeColors.TextPrimary
-            )
+        // Cabecalho: "Bem vindo ao GeoSaude" + "Cadastre-se" + link login
+        CadastroFormHeader(onNavigateToLogin = onNavigateToLogin)
 
-            Text(
-                text = "Cadastre-se",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = GeoSaudeColors.TextPrimary
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 2.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Text(
-                    text = "Já tem uma conta? ",
-                    fontSize = 12.sp,
-                    color = GeoSaudeColors.TextSecondary
-                )
-                Text(
-                    text = "Faça login",
-                    fontSize = 12.sp,
-                    color = GeoSaudeColors.Primary,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable { onNavigateToLogin() }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(2.dp))
-
+        // Matricula e Funcao lado a lado conforme Figma
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.Top
         ) {
+            // Campo matricula (somente digitos, max 8)
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = "Preencha com sua matrícula",
-                    fontSize = 13.sp,
+                    text = "Preencha com sua matricula",
+                    fontSize = 12.sp,
                     color = GeoSaudeColors.TextPrimary,
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
-                    lineHeight = 16.sp,
-                    modifier = Modifier.height(28.dp)
+                    lineHeight = 15.sp
                 )
 
                 OutlinedTextField(
                     value = formState.matricula,
                     onValueChange = { viewModel.onMatriculaChange(it) },
                     placeholder = {
-                        Text("123456789", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                        Text("123456789", color = GeoSaudeColors.Gray400, fontSize = 13.sp)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
                     singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = GeoSaudeColors.Primary,
-                        unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                        focusedContainerColor = GeoSaudeColors.White,
-                        unfocusedContainerColor = GeoSaudeColors.White
-                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = outlinedFieldColors(),
                     isError = formState.matriculaError != null
                 )
 
@@ -268,18 +268,18 @@ private fun CadastroForm(
                 }
             }
 
+            // Campo funcao (dropdown compativel KMP)
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = "Qual sua função?",
-                    fontSize = 13.sp,
+                    text = "Qual sua funcao?",
+                    fontSize = 12.sp,
                     color = GeoSaudeColors.TextPrimary,
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
-                    lineHeight = 16.sp,
-                    modifier = Modifier.height(28.dp)
+                    lineHeight = 15.sp
                 )
 
                 Box {
@@ -287,22 +287,20 @@ private fun CadastroForm(
                         value = formState.funcao,
                         onValueChange = {},
                         placeholder = {
-                            Text("-", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
+                            Text("-", color = GeoSaudeColors.Gray400, fontSize = 13.sp)
                         },
                         readOnly = true,
                         trailingIcon = {
-                            IconButton(onClick = {
-                                showFuncaoDropdown = !showFuncaoDropdown
-                            }) {
+                            IconButton(onClick = { showFuncaoDropdown = !showFuncaoDropdown }) {
                                 Icon(
                                     Icons.Default.ArrowDropDown,
-                                    contentDescription = null,
+                                    contentDescription = "Abrir lista de funcoes",
                                     tint = GeoSaudeColors.Gray600
                                 )
                             }
                         },
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        shape = RoundedCornerShape(10.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             disabledBorderColor = GeoSaudeColors.InputBorder,
                             disabledContainerColor = GeoSaudeColors.White,
@@ -318,7 +316,7 @@ private fun CadastroForm(
                     ) {
                         funcoes.forEach { funcao ->
                             DropdownMenuItem(
-                                text = { Text(funcao, fontSize = 14.sp) },
+                                text = { Text(funcao, fontSize = 13.sp) },
                                 onClick = {
                                     viewModel.onFuncaoChange(funcao)
                                     showFuncaoDropdown = false
@@ -338,183 +336,48 @@ private fun CadastroForm(
             }
         }
 
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = "Preencha com seu nome completo",
-                fontSize = 13.sp,
-                color = GeoSaudeColors.TextPrimary,
-                fontWeight = FontWeight.Medium
-            )
+        // Campo nome completo
+        CadastroTextField(
+            label = "Preencha com seu nome completo",
+            value = formState.nomeCompleto,
+            onValueChange = { viewModel.onNomeCompletoChange(it) },
+            placeholder = "Nome completo",
+            error = formState.nomeCompletoError
+        )
 
-            OutlinedTextField(
-                value = formState.nomeCompleto,
-                onValueChange = { viewModel.onNomeCompletoChange(it) },
-                placeholder = {
-                    Text("Nome completo", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = GeoSaudeColors.Primary,
-                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                    focusedContainerColor = GeoSaudeColors.White,
-                    unfocusedContainerColor = GeoSaudeColors.White
-                ),
-                isError = formState.nomeCompletoError != null
-            )
+        // Campo e-mail
+        CadastroTextField(
+            label = "E-mail",
+            value = formState.email,
+            onValueChange = { viewModel.onEmailChange(it) },
+            placeholder = "E-mail",
+            keyboardType = KeyboardType.Email,
+            error = formState.emailError
+        )
 
-            if (formState.nomeCompletoError != null) {
-                Text(
-                    text = formState.nomeCompletoError!!,
-                    color = GeoSaudeColors.Error,
-                    fontSize = 10.sp
-                )
-            }
-        }
+        // Campo senha
+        CadastroPasswordField(
+            label = "Crie uma senha",
+            value = formState.senha,
+            onValueChange = { viewModel.onSenhaChange(it) },
+            placeholder = "Senha",
+            isVisible = senhaVisivel,
+            onVisibilityToggle = { senhaVisivel = !senhaVisivel },
+            error = formState.senhaError
+        )
 
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = "E-mail",
-                fontSize = 13.sp,
-                color = GeoSaudeColors.TextPrimary,
-                fontWeight = FontWeight.Medium
-            )
+        // Campo confirmar senha - label conforme Figma: "Digite a senha novamente"
+        CadastroPasswordField(
+            label = "Digite a senha novamente",
+            value = formState.confirmarSenha,
+            onValueChange = { viewModel.onConfirmarSenhaChange(it) },
+            placeholder = "Senha",
+            isVisible = confirmarSenhaVisivel,
+            onVisibilityToggle = { confirmarSenhaVisivel = !confirmarSenhaVisivel },
+            error = formState.confirmarSenhaError
+        )
 
-            OutlinedTextField(
-                value = formState.email,
-                onValueChange = { viewModel.onEmailChange(it) },
-                placeholder = {
-                    Text("E-mail", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = GeoSaudeColors.Primary,
-                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                    focusedContainerColor = GeoSaudeColors.White,
-                    unfocusedContainerColor = GeoSaudeColors.White
-                ),
-                isError = formState.emailError != null
-            )
-
-            if (formState.emailError != null) {
-                Text(
-                    text = formState.emailError!!,
-                    color = GeoSaudeColors.Error,
-                    fontSize = 10.sp
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = "Crie uma senha",
-                fontSize = 13.sp,
-                color = GeoSaudeColors.TextPrimary,
-                fontWeight = FontWeight.Medium
-            )
-
-            OutlinedTextField(
-                value = formState.senha,
-                onValueChange = { viewModel.onSenhaChange(it) },
-                placeholder = {
-                    Text("Senha", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                },
-                visualTransformation = if (senhaVisivel) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(onClick = { senhaVisivel = !senhaVisivel }) {
-                        Icon(
-                            imageVector = if (senhaVisivel) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = null,
-                            tint = GeoSaudeColors.Gray400
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = GeoSaudeColors.Primary,
-                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                    focusedContainerColor = GeoSaudeColors.White,
-                    unfocusedContainerColor = GeoSaudeColors.White
-                ),
-                isError = formState.senhaError != null
-            )
-
-            if (formState.senhaError != null) {
-                Text(
-                    text = formState.senhaError!!,
-                    color = GeoSaudeColors.Error,
-                    fontSize = 10.sp
-                )
-            }
-        }
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = "Confirme sua senha",
-                fontSize = 13.sp,
-                color = GeoSaudeColors.TextPrimary,
-                fontWeight = FontWeight.Medium
-            )
-
-            OutlinedTextField(
-                value = formState.confirmarSenha,
-                onValueChange = { viewModel.onConfirmarSenhaChange(it) },
-                placeholder = {
-                    Text("Senha", color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                },
-                visualTransformation = if (confirmarSenhaVisivel) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(onClick = {
-                        confirmarSenhaVisivel = !confirmarSenhaVisivel
-                    }) {
-                        Icon(
-                            imageVector = if (confirmarSenhaVisivel) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                            contentDescription = null,
-                            tint = GeoSaudeColors.Gray400
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = GeoSaudeColors.Primary,
-                    unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                    focusedContainerColor = GeoSaudeColors.White,
-                    unfocusedContainerColor = GeoSaudeColors.White
-                ),
-                isError = formState.confirmarSenhaError != null
-            )
-
-            if (formState.confirmarSenhaError != null) {
-                Text(
-                    text = formState.confirmarSenhaError!!,
-                    color = GeoSaudeColors.Error,
-                    fontSize = 10.sp
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(2.dp))
-
+        // Erro geral de API
         if (errorMessage != null) {
             Text(
                 text = errorMessage!!,
@@ -524,6 +387,9 @@ private fun CadastroForm(
             )
         }
 
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Botao "Cadastrar"
         Button(
             onClick = {
                 errorMessage = null
@@ -532,9 +398,9 @@ private fun CadastroForm(
                     onError = { errorMessage = it }
                 )
             },
-            modifier = Modifier.fillMaxWidth().height(52.dp),
+            modifier = Modifier.fillMaxWidth().height(50.dp),
             enabled = !formState.isLoading,
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = GeoSaudeColors.Primary,
                 disabledContainerColor = GeoSaudeColors.Primary.copy(alpha = 0.6f)
@@ -542,7 +408,7 @@ private fun CadastroForm(
         ) {
             if (formState.isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(22.dp),
+                    modifier = Modifier.size(20.dp),
                     color = GeoSaudeColors.White,
                     strokeWidth = 2.dp
                 )
@@ -552,3 +418,172 @@ private fun CadastroForm(
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Componentes internos do cadastro
+// ---------------------------------------------------------------------------
+
+/**
+ * Cabecalho do formulario: "Bem vindo ao GeoSaude" + "Cadastre-se"
+ * + "Ja tem uma conta? Faca login" alinhado a direita.
+ */
+@Composable
+private fun CadastroFormHeader(onNavigateToLogin: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        // Linha com saudacao e link de login
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                text = buildAnnotatedString {
+                    append("Bem vindo ao ")
+                    withStyle(
+                        SpanStyle(
+                            color = GeoSaudeColors.Primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    ) {
+                        append("GeoSaude")
+                    }
+                },
+                fontSize = 14.sp,
+                color = GeoSaudeColors.TextPrimary
+            )
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = "Ja tem uma conta?",
+                    fontSize = 11.sp,
+                    color = GeoSaudeColors.TextSecondary
+                )
+                Text(
+                    text = "Faca login",
+                    fontSize = 11.sp,
+                    color = GeoSaudeColors.Primary,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.clickable { onNavigateToLogin() }
+                )
+            }
+        }
+
+        Text(
+            text = "Cadastre-se",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = GeoSaudeColors.TextPrimary
+        )
+    }
+}
+
+/**
+ * Campo de texto reutilizavel para o formulario de cadastro.
+ */
+@Composable
+private fun CadastroTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    error: String? = null
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = GeoSaudeColors.TextPrimary,
+            fontWeight = FontWeight.Medium
+        )
+
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = {
+                Text(placeholder, color = GeoSaudeColors.Gray400, fontSize = 13.sp)
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            singleLine = true,
+            shape = RoundedCornerShape(10.dp),
+            colors = outlinedFieldColors(),
+            isError = error != null
+        )
+
+        if (error != null) {
+            Text(text = error, color = GeoSaudeColors.Error, fontSize = 10.sp)
+        }
+    }
+}
+
+/**
+ * Campo de senha reutilizavel para o formulario de cadastro.
+ */
+@Composable
+private fun CadastroPasswordField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    isVisible: Boolean,
+    onVisibilityToggle: () -> Unit,
+    error: String? = null
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            color = GeoSaudeColors.TextPrimary,
+            fontWeight = FontWeight.Medium
+        )
+
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = {
+                Text(placeholder, color = GeoSaudeColors.Gray400, fontSize = 13.sp)
+            },
+            visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = onVisibilityToggle) {
+                    Icon(
+                        imageVector = if (isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = if (isVisible) "Ocultar senha" else "Exibir senha",
+                        tint = GeoSaudeColors.Gray400
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(50.dp),
+            singleLine = true,
+            shape = RoundedCornerShape(10.dp),
+            colors = outlinedFieldColors(),
+            isError = error != null
+        )
+
+        if (error != null) {
+            Text(text = error, color = GeoSaudeColors.Error, fontSize = 10.sp)
+        }
+    }
+}
+
+/**
+ * Cores padrao dos OutlinedTextField do formulario de cadastro.
+ * Centraliza para evitar repeticao em cada campo.
+ */
+@Composable
+private fun outlinedFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = GeoSaudeColors.Primary,
+    unfocusedBorderColor = GeoSaudeColors.InputBorder,
+    focusedContainerColor = GeoSaudeColors.White,
+    unfocusedContainerColor = GeoSaudeColors.White
+)
