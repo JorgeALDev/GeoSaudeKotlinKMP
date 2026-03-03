@@ -28,7 +28,7 @@ import com.geosaude.app.presentation.components.LogoHeader
 import com.geosaude.app.presentation.theme.GeoSaudeColors
 
 // ---------------------------------------------------------------------------
-// Ponto de entrada: detecta largura e delega para layout Mobile ou Desktop
+// Ponto de entrada: layout responsivo Mobile / Desktop
 // ---------------------------------------------------------------------------
 
 /**
@@ -37,7 +37,7 @@ import com.geosaude.app.presentation.theme.GeoSaudeColors
  *
  * @param onNavigateToCadastro Navega para tela de cadastro.
  * @param onNavigateToRecuperarSenha Navega para recuperacao de senha.
- * @param onLoginSuccess Executado apos login bem-sucedido, recebe a funcao do usuario.
+ * @param onLoginSuccess Executado apos login bem-sucedido.
  */
 @Composable
 fun LoginScreen(
@@ -69,11 +69,8 @@ fun LoginScreen(
 // ---------------------------------------------------------------------------
 
 /**
- * Layout desktop conforme Frame 2 do Figma:
- * - Esquerda: fundo verde com logo no topo + ilustracao centralizada (sem textos).
- * - Direita: fundo branco com card contendo o formulario de login.
- * - Card sem borda, apenas sombra suave.
- * - "Esqueceu sua senha?" fica ABAIXO do botao "Entrar".
+ * Desktop: ilustracao na esquerda (com logo sobreposto no topo),
+ * formulario de login na direita em card sem borda.
  */
 @Composable
 private fun LoginScreenDesktop(
@@ -82,55 +79,49 @@ private fun LoginScreenDesktop(
     onLoginSuccess: (String) -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
-        // Metade esquerda: logo sobre ilustracao, sem textos sobrepostos
+        // Metade esquerda: ilustracao com logo no topo
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
                 .background(GeoSaudeColors.Background)
         ) {
-            // Ilustracao centralizada (sem textos conforme Figma)
             IllustrationSection()
 
-            // Logo "GeoSaude" no canto superior esquerdo sobre a ilustracao
             LogoHeader(
                 backgroundColor = GeoSaudeColors.Background,
                 modifier = Modifier.align(Alignment.TopStart)
             )
         }
 
-        // Metade direita: formulario de login
-        Column(
+        // Metade direita: formulario
+        Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(GeoSaudeColors.White)
+                .background(GeoSaudeColors.White),
+            contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            Card(
+                modifier = Modifier
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth(0.85f)
+                    .wrapContentHeight()
+                    .shadow(
+                        elevation = 12.dp,
+                        shape = RoundedCornerShape(24.dp),
+                        spotColor = GeoSaudeColors.Primary.copy(alpha = 0.15f)
+                    ),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = GeoSaudeColors.CardBackground
+                )
             ) {
-                Card(
-                    modifier = Modifier
-                        .widthIn(max = 600.dp)
-                        .fillMaxWidth(0.85f)
-                        .wrapContentHeight()
-                        .shadow(
-                            elevation = 12.dp,
-                            shape = RoundedCornerShape(24.dp),
-                            spotColor = GeoSaudeColors.Primary.copy(alpha = 0.15f)
-                        ),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = GeoSaudeColors.CardBackground
-                    )
-                ) {
-                    LoginFormDesktop(
-                        onNavigateToCadastro = onNavigateToCadastro,
-                        onNavigateToRecuperarSenha = onNavigateToRecuperarSenha,
-                        onLoginSuccess = onLoginSuccess
-                    )
-                }
+                LoginFormDesktop(
+                    onNavigateToCadastro = onNavigateToCadastro,
+                    onNavigateToRecuperarSenha = onNavigateToRecuperarSenha,
+                    onLoginSuccess = onLoginSuccess
+                )
             }
         }
     }
@@ -141,11 +132,8 @@ private fun LoginScreenDesktop(
 // ---------------------------------------------------------------------------
 
 /**
- * Layout mobile conforme Figma:
- * - Logo "GeoSaude" no topo com fundo verde.
- * - Card branco arredondado com formulario.
- * - Inclui campo "Qual sua funcao?" (dropdown) conforme Figma mobile.
- * - "Esqueceu sua senha?" abaixo do botao.
+ * Mobile: logo no topo, card com formulario abaixo.
+ * Inclui campo "Qual sua funcao?" conforme Figma mobile.
  */
 @Composable
 private fun LoginScreenMobile(
@@ -189,13 +177,13 @@ private fun LoginScreenMobile(
 }
 
 // ---------------------------------------------------------------------------
-// Formulario Desktop (sem campo funcao, "Esqueceu senha?" apos botao)
+// Formulario Desktop: matricula + senha + Entrar + Esqueceu senha?
 // ---------------------------------------------------------------------------
 
 /**
- * Formulario de login para desktop conforme Frame 2 do Figma.
- * Campos: matricula, senha.
- * Ordem: cabecalho > matricula > senha > botao Entrar > "Esqueceu sua senha?"
+ * Formulario desktop conforme Frame 2 do Figma.
+ * Campos: matricula, senha. Sem campo funcao.
+ * "Esqueceu sua senha?" fica ABAIXO do botao "Entrar".
  */
 @Composable
 private fun LoginFormDesktop(
@@ -217,20 +205,20 @@ private fun LoginFormDesktop(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Cabecalho: "Bem vindo ao GeoSaude" + "Login" + link cadastro
+        // Cabecalho
         LoginFormHeader(onNavigateToCadastro = onNavigateToCadastro)
 
-        // Campo de matricula
-        FormTextField(
-            label = "Coloque seu e-mail ou matricula",
+        // Campo matricula (apenas matricula, nao email)
+        LoginTextField(
+            label = "Coloque sua matricula",
             value = formState.matricula,
             onValueChange = { viewModel.onMatriculaChange(it) },
-            placeholder = "E-mail ou matricula",
+            placeholder = "Matricula",
             error = formState.matriculaError
         )
 
-        // Campo de senha
-        PasswordField(
+        // Campo senha
+        LoginPasswordField(
             label = "Coloque sua senha",
             value = formState.senha,
             onValueChange = { viewModel.onSenhaChange(it) },
@@ -240,7 +228,7 @@ private fun LoginFormDesktop(
             error = formState.senhaError
         )
 
-        // Erro geral de autenticacao
+        // Erro geral
         if (errorMessage != null) {
             Text(
                 text = errorMessage!!,
@@ -249,7 +237,7 @@ private fun LoginFormDesktop(
             )
         }
 
-        // Botao "Entrar"
+        // Botao Entrar
         LoginButton(
             isLoading = formState.isLoading,
             onClick = {
@@ -261,7 +249,7 @@ private fun LoginFormDesktop(
             }
         )
 
-        // "Esqueceu sua senha?" - ABAIXO do botao conforme Figma
+        // "Esqueceu sua senha?" abaixo do botao conforme Figma
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -278,13 +266,13 @@ private fun LoginFormDesktop(
 }
 
 // ---------------------------------------------------------------------------
-// Formulario Mobile (com campo funcao, "Esqueceu senha?" apos botao)
+// Formulario Mobile: matricula + senha + funcao + Esqueceu senha? + Entrar
 // ---------------------------------------------------------------------------
 
 /**
- * Formulario de login para mobile conforme Figma Mobile.
- * Inclui campo "Qual sua funcao?" com dropdown alem de matricula e senha.
- * Ordem: cabecalho > matricula > senha > funcao > "Esqueceu senha?" > botao Entrar
+ * Formulario mobile conforme Figma Mobile.
+ * Inclui campo "Qual sua funcao?" com dropdown.
+ * "Esqueceu sua senha?" acima do botao.
  */
 @Composable
 private fun LoginFormMobile(
@@ -313,17 +301,17 @@ private fun LoginFormMobile(
         // Cabecalho compacto
         LoginFormHeader(onNavigateToCadastro = onNavigateToCadastro)
 
-        // Campo de matricula
-        FormTextField(
-            label = "Coloque seu e-mail ou matricula",
+        // Campo matricula (apenas matricula)
+        LoginTextField(
+            label = "Coloque sua matricula",
             value = formState.matricula,
             onValueChange = { viewModel.onMatriculaChange(it) },
-            placeholder = "E-mail ou matricula",
+            placeholder = "Matricula",
             error = formState.matriculaError
         )
 
-        // Campo de senha
-        PasswordField(
+        // Campo senha
+        LoginPasswordField(
             label = "Coloque sua senha",
             value = formState.senha,
             onValueChange = { viewModel.onSenhaChange(it) },
@@ -333,8 +321,8 @@ private fun LoginFormMobile(
             error = formState.senhaError
         )
 
-        // Campo "Qual sua funcao?" - presente apenas no mobile conforme Figma
-        DropdownField(
+        // Campo funcao (mobile only)
+        LoginDropdownField(
             label = "Qual sua funcao?",
             value = funcaoSelecionada,
             options = funcoes,
@@ -370,7 +358,7 @@ private fun LoginFormMobile(
             )
         }
 
-        // Botao "Entrar"
+        // Botao Entrar
         LoginButton(
             isLoading = formState.isLoading,
             onClick = {
@@ -385,77 +373,70 @@ private fun LoginFormMobile(
 }
 
 // ---------------------------------------------------------------------------
-// Componentes reutilizaveis
+// Componentes reutilizaveis do Login
 // ---------------------------------------------------------------------------
 
 /**
- * Cabecalho do formulario de login.
- * Linha 1: "Bem vindo ao GeoSaude"
- * Linha 2: "Login" (grande) + "Nao tem conta? Cadastre-se" (alinhado a direita)
+ * Cabecalho: "Bem vindo ao GeoSaude" + "Login" na mesma linha que
+ * "Nao tem conta? Cadastre-se" (alinhado a direita, mesma altura do titulo).
  */
 @Composable
 private fun LoginFormHeader(onNavigateToCadastro: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(
-            text = buildAnnotatedString {
-                append("Bem vindo ao ")
-                withStyle(
-                    SpanStyle(
-                        color = GeoSaudeColors.Primary,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                ) {
-                    append("GeoSaude")
-                }
-            },
-            fontSize = 15.sp,
-            color = GeoSaudeColors.TextPrimary
-        )
-
+        // Linha 1: saudacao + link cadastro lado a lado
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Login",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
+                text = buildAnnotatedString {
+                    append("Bem vindo ao ")
+                    withStyle(
+                        SpanStyle(
+                            color = GeoSaudeColors.Primary,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    ) {
+                        append("GeoSaude")
+                    }
+                },
+                fontSize = 15.sp,
                 color = GeoSaudeColors.TextPrimary
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Nao tem conta?\n",
-                    fontSize = 12.sp,
+                    text = "Nao tem conta? ",
+                    fontSize = 11.sp,
                     color = GeoSaudeColors.TextSecondary
                 )
                 Text(
                     text = "Cadastre-se",
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = GeoSaudeColors.Primary,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickable { onNavigateToCadastro() }
                 )
             }
         }
+
+        // Linha 2: titulo "Login"
+        Text(
+            text = "Login",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            color = GeoSaudeColors.TextPrimary
+        )
     }
 }
 
-/**
- * Campo de texto reutilizavel com label, placeholder e erro opcional.
- *
- * @param label Rotulo acima do campo.
- * @param value Valor atual.
- * @param onValueChange Callback de alteracao.
- * @param placeholder Texto placeholder.
- * @param error Mensagem de erro; null se valido.
- */
+/** Campo de texto simples reutilizavel. */
 @Composable
-private fun FormTextField(
+private fun LoginTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
@@ -497,19 +478,9 @@ private fun FormTextField(
     }
 }
 
-/**
- * Campo de senha com toggle de visibilidade.
- *
- * @param label Rotulo acima do campo.
- * @param value Valor atual da senha.
- * @param onValueChange Callback de alteracao.
- * @param placeholder Texto placeholder.
- * @param isVisible Se a senha esta visivel em texto plano.
- * @param onVisibilityToggle Alterna visibilidade.
- * @param error Mensagem de erro; null se valido.
- */
+/** Campo de senha com toggle de visibilidade. */
 @Composable
-private fun PasswordField(
+private fun LoginPasswordField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
@@ -563,19 +534,9 @@ private fun PasswordField(
     }
 }
 
-/**
- * Campo dropdown reutilizavel usando Box + DropdownMenu (compativel com KMP).
- *
- * @param label Rotulo acima do campo.
- * @param value Opcao selecionada.
- * @param options Lista de opcoes.
- * @param expanded Se o menu esta aberto.
- * @param onExpandedChange Alterna abertura do menu.
- * @param onValueChange Callback quando uma opcao e selecionada.
- * @param placeholder Texto quando nada esta selecionado.
- */
+/** Dropdown usando Box + DropdownMenu (compativel KMP). */
 @Composable
-private fun DropdownField(
+private fun LoginDropdownField(
     label: String,
     value: String,
     options: List<String>,
@@ -637,12 +598,7 @@ private fun DropdownField(
     }
 }
 
-/**
- * Botao "Entrar" com indicador de carregamento.
- *
- * @param isLoading Se esta aguardando resposta da API.
- * @param onClick Callback ao clicar.
- */
+/** Botao "Entrar" com loading. */
 @Composable
 private fun LoginButton(
     isLoading: Boolean,
