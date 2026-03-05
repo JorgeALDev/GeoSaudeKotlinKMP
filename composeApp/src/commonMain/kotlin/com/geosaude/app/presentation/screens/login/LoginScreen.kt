@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
@@ -27,17 +26,10 @@ import com.geosaude.app.presentation.components.IllustrationSection
 import com.geosaude.app.presentation.components.LogoHeader
 import com.geosaude.app.presentation.theme.GeoSaudeColors
 
-// ---------------------------------------------------------------------------
-// Ponto de entrada: layout responsivo Mobile / Desktop
-// ---------------------------------------------------------------------------
-
 /**
  * Tela de login com layout responsivo.
  * Breakpoint de 800dp para alternar entre Mobile e Desktop.
- *
- * @param onNavigateToCadastro Navega para tela de cadastro.
- * @param onNavigateToRecuperarSenha Navega para recuperacao de senha.
- * @param onLoginSuccess Executado apos login bem-sucedido.
+ * Conteudo dos campos e IDENTICO em ambos, apenas o design (layout) muda.
  */
 @Composable
 fun LoginScreen(
@@ -65,13 +57,9 @@ fun LoginScreen(
 }
 
 // ---------------------------------------------------------------------------
-// Layout Desktop (Frame 2 do Figma)
+// Layout Desktop
 // ---------------------------------------------------------------------------
 
-/**
- * Desktop: ilustracao na esquerda (com logo sobreposto no topo),
- * formulario de login na direita em card sem borda.
- */
 @Composable
 private fun LoginScreenDesktop(
     onNavigateToCadastro: () -> Unit,
@@ -79,7 +67,6 @@ private fun LoginScreenDesktop(
     onLoginSuccess: (String) -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
-        // Metade esquerda: ilustracao com logo no topo
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -87,14 +74,12 @@ private fun LoginScreenDesktop(
                 .background(GeoSaudeColors.Background)
         ) {
             IllustrationSection()
-
             LogoHeader(
                 backgroundColor = GeoSaudeColors.Background,
                 modifier = Modifier.align(Alignment.TopStart)
             )
         }
 
-        // Metade direita: formulario
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -113,14 +98,15 @@ private fun LoginScreenDesktop(
                         spotColor = GeoSaudeColors.Primary.copy(alpha = 0.15f)
                     ),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = GeoSaudeColors.CardBackground
-                )
+                colors = CardDefaults.cardColors(containerColor = GeoSaudeColors.CardBackground)
             ) {
-                LoginFormDesktop(
+                LoginForm(
                     onNavigateToCadastro = onNavigateToCadastro,
                     onNavigateToRecuperarSenha = onNavigateToRecuperarSenha,
-                    onLoginSuccess = onLoginSuccess
+                    onLoginSuccess = onLoginSuccess,
+                    horizontalPadding = 48.dp,
+                    verticalPadding = 40.dp,
+                    spacing = 20.dp
                 )
             }
         }
@@ -128,13 +114,9 @@ private fun LoginScreenDesktop(
 }
 
 // ---------------------------------------------------------------------------
-// Layout Mobile (Figma Login Mobile)
+// Layout Mobile
 // ---------------------------------------------------------------------------
 
-/**
- * Mobile: logo no topo, card com formulario abaixo.
- * Inclui campo "Qual sua funcao?" conforme Figma mobile.
- */
 @Composable
 private fun LoginScreenMobile(
     onNavigateToCadastro: () -> Unit,
@@ -162,14 +144,15 @@ private fun LoginScreenMobile(
                         spotColor = GeoSaudeColors.Primary.copy(alpha = 0.1f)
                     ),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = GeoSaudeColors.CardBackground
-                )
+                colors = CardDefaults.cardColors(containerColor = GeoSaudeColors.CardBackground)
             ) {
-                LoginFormMobile(
+                LoginForm(
                     onNavigateToCadastro = onNavigateToCadastro,
                     onNavigateToRecuperarSenha = onNavigateToRecuperarSenha,
-                    onLoginSuccess = onLoginSuccess
+                    onLoginSuccess = onLoginSuccess,
+                    horizontalPadding = 24.dp,
+                    verticalPadding = 28.dp,
+                    spacing = 16.dp
                 )
             }
         }
@@ -177,19 +160,19 @@ private fun LoginScreenMobile(
 }
 
 // ---------------------------------------------------------------------------
-// Formulario Desktop: matricula + senha + Entrar + Esqueceu senha?
+// Formulario UNICO (usado por Mobile e Desktop)
+// Campos identicos: matricula + senha + Entrar + Esqueceu senha?
+// Sem campo "funcao" — a funcao vem do backend pela matricula.
 // ---------------------------------------------------------------------------
 
-/**
- * Formulario desktop conforme Frame 2 do Figma.
- * Campos: matricula, senha. Sem campo funcao.
- * "Esqueceu sua senha?" fica ABAIXO do botao "Entrar".
- */
 @Composable
-private fun LoginFormDesktop(
+private fun LoginForm(
     onNavigateToCadastro: () -> Unit,
     onNavigateToRecuperarSenha: () -> Unit,
-    onLoginSuccess: (String) -> Unit
+    onLoginSuccess: (String) -> Unit,
+    horizontalPadding: androidx.compose.ui.unit.Dp,
+    verticalPadding: androidx.compose.ui.unit.Dp,
+    spacing: androidx.compose.ui.unit.Dp
 ) {
     val viewModel = org.koin.compose.koinInject<LoginViewModel>()
     val formState by viewModel.formState.collectAsState()
@@ -201,14 +184,14 @@ private fun LoginFormDesktop(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 48.dp, vertical = 40.dp),
+            .padding(horizontal = horizontalPadding, vertical = verticalPadding),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(spacing)
     ) {
         // Cabecalho
         LoginFormHeader(onNavigateToCadastro = onNavigateToCadastro)
 
-        // Campo matricula (apenas matricula, nao email)
+        // Campo matricula
         LoginTextField(
             label = "Coloque sua matricula",
             value = formState.matricula,
@@ -230,11 +213,7 @@ private fun LoginFormDesktop(
 
         // Erro geral
         if (errorMessage != null) {
-            Text(
-                text = errorMessage!!,
-                color = GeoSaudeColors.Error,
-                fontSize = 13.sp
-            )
+            Text(text = errorMessage!!, color = GeoSaudeColors.Error, fontSize = 13.sp)
         }
 
         // Botao Entrar
@@ -249,7 +228,7 @@ private fun LoginFormDesktop(
             }
         )
 
-        // "Esqueceu sua senha?" abaixo do botao conforme Figma
+        // "Esqueceu sua senha?"
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -266,127 +245,15 @@ private fun LoginFormDesktop(
 }
 
 // ---------------------------------------------------------------------------
-// Formulario Mobile: matricula + senha + funcao + Esqueceu senha? + Entrar
+// Componentes reutilizaveis
 // ---------------------------------------------------------------------------
 
-/**
- * Formulario mobile conforme Figma Mobile.
- * Inclui campo "Qual sua funcao?" com dropdown.
- * "Esqueceu sua senha?" acima do botao.
- */
-@Composable
-private fun LoginFormMobile(
-    onNavigateToCadastro: () -> Unit,
-    onNavigateToRecuperarSenha: () -> Unit,
-    onLoginSuccess: (String) -> Unit
-) {
-    val viewModel = org.koin.compose.koinInject<LoginViewModel>()
-    val formState by viewModel.formState.collectAsState()
-
-    var senhaVisivel by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var showFuncaoDropdown by remember { mutableStateOf(false) }
-    var funcaoSelecionada by remember { mutableStateOf("") }
-
-    val funcoes = listOf("Agente de Campo", "Supervisor")
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 28.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Cabecalho compacto
-        LoginFormHeader(onNavigateToCadastro = onNavigateToCadastro)
-
-        // Campo matricula (apenas matricula)
-        LoginTextField(
-            label = "Coloque sua matricula",
-            value = formState.matricula,
-            onValueChange = { viewModel.onMatriculaChange(it) },
-            placeholder = "Matricula",
-            error = formState.matriculaError
-        )
-
-        // Campo senha
-        LoginPasswordField(
-            label = "Coloque sua senha",
-            value = formState.senha,
-            onValueChange = { viewModel.onSenhaChange(it) },
-            placeholder = "Senha",
-            isVisible = senhaVisivel,
-            onVisibilityToggle = { senhaVisivel = !senhaVisivel },
-            error = formState.senhaError
-        )
-
-        // Campo funcao (mobile only)
-        LoginDropdownField(
-            label = "Qual sua funcao?",
-            value = funcaoSelecionada,
-            options = funcoes,
-            expanded = showFuncaoDropdown,
-            onExpandedChange = { showFuncaoDropdown = it },
-            onValueChange = {
-                funcaoSelecionada = it
-                showFuncaoDropdown = false
-            },
-            placeholder = "-"
-        )
-
-        // "Esqueceu sua senha?" alinhado a direita
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text(
-                text = "Esqueceu sua senha?",
-                fontSize = 12.sp,
-                color = GeoSaudeColors.Primary,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.clickable { onNavigateToRecuperarSenha() }
-            )
-        }
-
-        // Erro geral
-        if (errorMessage != null) {
-            Text(
-                text = errorMessage!!,
-                color = GeoSaudeColors.Error,
-                fontSize = 12.sp
-            )
-        }
-
-        // Botao Entrar
-        LoginButton(
-            isLoading = formState.isLoading,
-            onClick = {
-                errorMessage = null
-                viewModel.onLogin(
-                    onSuccess = onLoginSuccess,
-                    onError = { errorMessage = it }
-                )
-            }
-        )
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Componentes reutilizaveis do Login
-// ---------------------------------------------------------------------------
-
-/**
- * Cabecalho: "Bem vindo ao GeoSaude" + "Login" na mesma linha que
- * "Nao tem conta? Cadastre-se" (alinhado a direita, mesma altura do titulo).
- */
 @Composable
 private fun LoginFormHeader(onNavigateToCadastro: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        // Linha 1: saudacao + link cadastro lado a lado
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -395,12 +262,7 @@ private fun LoginFormHeader(onNavigateToCadastro: () -> Unit) {
             Text(
                 text = buildAnnotatedString {
                     append("Bem vindo ao ")
-                    withStyle(
-                        SpanStyle(
-                            color = GeoSaudeColors.Primary,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    ) {
+                    withStyle(SpanStyle(color = GeoSaudeColors.Primary, fontWeight = FontWeight.SemiBold)) {
                         append("GeoSaude")
                     }
                 },
@@ -409,13 +271,9 @@ private fun LoginFormHeader(onNavigateToCadastro: () -> Unit) {
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Nao tem conta? ", fontSize = 11.sp, color = GeoSaudeColors.TextSecondary)
                 Text(
-                    text = "Nao tem conta? ",
-                    fontSize = 11.sp,
-                    color = GeoSaudeColors.TextSecondary
-                )
-                Text(
-                    text = "Cadastre-se",
+                    "Cadastre-se",
                     fontSize = 11.sp,
                     color = GeoSaudeColors.Primary,
                     fontWeight = FontWeight.SemiBold,
@@ -424,186 +282,67 @@ private fun LoginFormHeader(onNavigateToCadastro: () -> Unit) {
             }
         }
 
-        // Linha 2: titulo "Login"
-        Text(
-            text = "Login",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = GeoSaudeColors.TextPrimary
-        )
+        Text("Login", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = GeoSaudeColors.TextPrimary)
     }
 }
 
-/** Campo de texto simples reutilizavel. */
 @Composable
 private fun LoginTextField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    error: String? = null
+    label: String, value: String, onValueChange: (String) -> Unit,
+    placeholder: String, error: String? = null
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = GeoSaudeColors.TextPrimary,
-            fontWeight = FontWeight.Medium
-        )
-
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(label, fontSize = 14.sp, color = GeoSaudeColors.TextPrimary, fontWeight = FontWeight.Medium)
         OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = {
-                Text(placeholder, color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-            },
-            modifier = Modifier.fillMaxWidth().height(54.dp),
-            singleLine = true,
+            value = value, onValueChange = onValueChange,
+            placeholder = { Text(placeholder, color = GeoSaudeColors.Gray400, fontSize = 14.sp) },
+            modifier = Modifier.fillMaxWidth().height(54.dp), singleLine = true,
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = GeoSaudeColors.Primary,
-                unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                focusedContainerColor = GeoSaudeColors.White,
-                unfocusedContainerColor = GeoSaudeColors.White
+                focusedBorderColor = GeoSaudeColors.Primary, unfocusedBorderColor = GeoSaudeColors.InputBorder,
+                focusedContainerColor = GeoSaudeColors.White, unfocusedContainerColor = GeoSaudeColors.White
             ),
             isError = error != null
         )
-
-        if (error != null) {
-            Text(text = error, color = GeoSaudeColors.Error, fontSize = 11.sp)
-        }
+        if (error != null) Text(error, color = GeoSaudeColors.Error, fontSize = 11.sp)
     }
 }
 
-/** Campo de senha com toggle de visibilidade. */
 @Composable
 private fun LoginPasswordField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    isVisible: Boolean,
-    onVisibilityToggle: () -> Unit,
+    label: String, value: String, onValueChange: (String) -> Unit,
+    placeholder: String, isVisible: Boolean, onVisibilityToggle: () -> Unit,
     error: String? = null
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = GeoSaudeColors.TextPrimary,
-            fontWeight = FontWeight.Medium
-        )
-
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(label, fontSize = 14.sp, color = GeoSaudeColors.TextPrimary, fontWeight = FontWeight.Medium)
         OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = {
-                Text(placeholder, color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-            },
+            value = value, onValueChange = onValueChange,
+            placeholder = { Text(placeholder, color = GeoSaudeColors.Gray400, fontSize = 14.sp) },
             visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = onVisibilityToggle) {
                     Icon(
-                        imageVector = if (isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        if (isVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                         contentDescription = if (isVisible) "Ocultar senha" else "Exibir senha",
                         tint = GeoSaudeColors.Gray400
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(54.dp),
-            singleLine = true,
+            modifier = Modifier.fillMaxWidth().height(54.dp), singleLine = true,
             shape = RoundedCornerShape(10.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = GeoSaudeColors.Primary,
-                unfocusedBorderColor = GeoSaudeColors.InputBorder,
-                focusedContainerColor = GeoSaudeColors.White,
-                unfocusedContainerColor = GeoSaudeColors.White
+                focusedBorderColor = GeoSaudeColors.Primary, unfocusedBorderColor = GeoSaudeColors.InputBorder,
+                focusedContainerColor = GeoSaudeColors.White, unfocusedContainerColor = GeoSaudeColors.White
             ),
             isError = error != null
         )
-
-        if (error != null) {
-            Text(text = error, color = GeoSaudeColors.Error, fontSize = 11.sp)
-        }
+        if (error != null) Text(error, color = GeoSaudeColors.Error, fontSize = 11.sp)
     }
 }
 
-/** Dropdown usando Box + DropdownMenu (compativel KMP). */
 @Composable
-private fun LoginDropdownField(
-    label: String,
-    value: String,
-    options: List<String>,
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    onValueChange: (String) -> Unit,
-    placeholder: String = "Selecione"
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = GeoSaudeColors.TextPrimary,
-            fontWeight = FontWeight.Medium
-        )
-
-        Box {
-            OutlinedTextField(
-                value = value,
-                onValueChange = {},
-                placeholder = {
-                    Text(placeholder, color = GeoSaudeColors.Gray400, fontSize = 14.sp)
-                },
-                readOnly = true,
-                trailingIcon = {
-                    IconButton(onClick = { onExpandedChange(!expanded) }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Abrir lista de opcoes",
-                            tint = GeoSaudeColors.Gray400
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(54.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledBorderColor = GeoSaudeColors.InputBorder,
-                    disabledContainerColor = GeoSaudeColors.White,
-                    disabledTextColor = GeoSaudeColors.TextPrimary
-                ),
-                enabled = false
-            )
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { onExpandedChange(false) }
-            ) {
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option, fontSize = 14.sp) },
-                        onClick = { onValueChange(option) }
-                    )
-                }
-            }
-        }
-    }
-}
-
-/** Botao "Entrar" com loading. */
-@Composable
-private fun LoginButton(
-    isLoading: Boolean,
-    onClick: () -> Unit
-) {
+private fun LoginButton(isLoading: Boolean, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(54.dp),
@@ -615,11 +354,7 @@ private fun LoginButton(
         )
     ) {
         if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(22.dp),
-                color = GeoSaudeColors.White,
-                strokeWidth = 2.dp
-            )
+            CircularProgressIndicator(modifier = Modifier.size(22.dp), color = GeoSaudeColors.White, strokeWidth = 2.dp)
         } else {
             Text("Entrar", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
