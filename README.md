@@ -1,76 +1,73 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM).
+# 🦟 GeoSaúde KMP
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Sistema multiplataforma (Android + Desktop) para agentes de combate a endemias, focado em registro e acompanhamento de visitas domiciliares para controle de dengue e outras arboviroses.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Stack
 
-### Build and Run Android Application
+<p align="left">
+  <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin"/>
+  <img src="https://img.shields.io/badge/Compose_Multiplatform-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" alt="Compose"/>
+  <img src="https://img.shields.io/badge/Koin-F78C40?style=for-the-badge&logoColor=white" alt="Koin"/>
+  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android"/>
+  <img src="https://img.shields.io/badge/Desktop_(JVM)-007396?style=for-the-badge&logo=openjdk&logoColor=white" alt="Desktop"/>
+</p>
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+| Tecnologia | Uso |
+|---|---|
+| Kotlin Multiplatform | Código compartilhado entre Android e Desktop |
+| Compose Multiplatform | Interface gráfica responsiva |
+| Koin | Injeção de dependências |
+| ViewModel + StateFlow | Gerenciamento de estado reativo |
 
-### Build and Run Desktop (JVM) Application
+## Funcionalidades
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+- Login e Cadastro de agentes (matrícula + senha)
+- Recuperação de senha
+- Formulário de Nova Visita com 5 seções expansíveis
+- Layout responsivo (mobile e desktop)
 
-### Build and Run Web Application
+## Estrutura do projeto
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+```
+composeApp/src/
+├── commonMain/     → Código compartilhado (telas, ViewModels, modelos)
+├── androidMain/    → Navegação e entry point Android
+└── jvmMain/        → Entry point Desktop (JVM)
+```
 
-### Build and Run iOS Application
+## Setup local
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+### Pré-requisitos
+- Android Studio Ladybug (2024.2+) ou IntelliJ IDEA
+- JDK 17+
+- Android SDK (API 24+)
 
----
+### Rodar o projeto
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+```bash
+# Clonar
+git clone https://github.com/JorgeALDev/GeoSaudeKotlinKMP.git
+cd GeoSaudeKotlinKMP
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+# Desktop
+./gradlew :composeApp:run
+
+# Android
+./gradlew :composeApp:assembleDebug
+```
+
+Tempo estimado do primeiro build: ~5-10 minutos (download de dependências).
+
+## Branches
+
+| Branch | Finalidade |
+|---|---|
+| `main` | Versão estável (protegida, requer PR) |
+| `develop` | Desenvolvimento ativo |
+
+## Equipe
+
+| Membro | Papel |
+|---|---|
+| [@JorgeALDev](https://github.com/JorgeALDev) | Desenvolvedor |
+| [@RuanVianaBatista](https://github.com/RuanVianaBatista) | Desenvolvedor |
