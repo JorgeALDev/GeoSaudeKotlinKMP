@@ -4,9 +4,9 @@ import androidx.compose.runtime.*
 import com.geosaude.app.presentation.screens.login.LoginScreen
 import com.geosaude.app.presentation.screens.cadastro.CadastroScreen
 import com.geosaude.app.presentation.screens.main.MainScreen
-import com.geosaude.app.presentation.screens.recuperacao.RecuperacaoSenhaScreen
+import com.geosaude.app.presentation.screens.recuperarsenha.RecuperarSenhaScreen
 import com.geosaude.app.presentation.theme.GeoSaudeTheme
-import com.geosaude.app.presentation.screens.recuperacao.RecuperacaoSenhaViewModel
+
 
 @Composable
 actual fun App() {
@@ -24,8 +24,9 @@ actual fun App() {
                 onCadastroSuccess = { currentScreen = "login" }
             )
 
-            "recuperar_senha" -> RecuperacaoSenhaScreen(
-                onNavigateToLogin = { currentScreen = "login"}
+            "recuperar_senha" -> RecuperarSenhaScreen(
+                onNavigateBack = { currentScreen = "login"},
+                onEnviarSuccess = { currentScreen = "login"}
             )
 
             "main" -> MainScreen(

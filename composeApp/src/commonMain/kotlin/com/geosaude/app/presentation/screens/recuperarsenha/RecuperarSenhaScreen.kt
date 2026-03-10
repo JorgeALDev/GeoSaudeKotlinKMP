@@ -1,4 +1,4 @@
-package com.geosaude.app.presentation.screens.recuperacao
+package com.geosaude.app.presentation.screens.recuperarsenha
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -34,7 +34,7 @@ import com.geosaude.app.presentation.theme.GeoSaudeColors
  * @param onEnviarSuccess Callback executado após envio bem-sucedido do e-mail.
  */
 @Composable
-fun RecuperacaoSenhaScreen(
+fun RecuperarSenhaScreen(
     onNavigateBack: () -> Unit,
     onEnviarSuccess: () -> Unit
 ) {
@@ -42,12 +42,12 @@ fun RecuperacaoSenhaScreen(
         val isDesktop = maxWidth >= 800.dp
 
         if (isDesktop) {
-            RecuperacaoSenhaScreenDesktop(
+            RecuperarSenhaScreenDesktop(
                 onNavigateBack = onNavigateBack,
                 onEnviarSuccess = onEnviarSuccess
             )
         } else {
-            RecuperacaoSenhaScreenMobile(
+            RecuperarSenhaScreenMobile(
                 onNavigateBack = onNavigateBack,
                 onEnviarSuccess = onEnviarSuccess
             )
@@ -65,7 +65,7 @@ fun RecuperacaoSenhaScreen(
  * - Direita: fundo branco com formulário de recuperação em card.
  */
 @Composable
-private fun RecuperacaoSenhaScreenDesktop(
+private fun RecuperarSenhaScreenDesktop(
     onNavigateBack: () -> Unit,
     onEnviarSuccess: () -> Unit
 ) {
@@ -112,7 +112,7 @@ private fun RecuperacaoSenhaScreenDesktop(
                         containerColor = GeoSaudeColors.CardBackground
                     )
                 ) {
-                    RecuperacaoSenhaForm(
+                    RecuperarSenhaForm(
                         onEnviarSuccess = onEnviarSuccess,
                         isDesktop = true
                     )
@@ -132,7 +132,7 @@ private fun RecuperacaoSenhaScreenDesktop(
  * - Card arredondado com formulário de recuperação.
  */
 @Composable
-private fun RecuperacaoSenhaScreenMobile(
+private fun RecuperarSenhaScreenMobile(
     onNavigateBack: () -> Unit,
     onEnviarSuccess: () -> Unit
 ) {
@@ -161,7 +161,7 @@ private fun RecuperacaoSenhaScreenMobile(
                     containerColor = GeoSaudeColors.CardBackground
                 )
             ) {
-                RecuperacaoSenhaForm(
+                RecuperarSenhaForm(
                     onEnviarSuccess = onEnviarSuccess,
                     isDesktop = false
                 )
@@ -185,11 +185,11 @@ private fun RecuperacaoSenhaScreenMobile(
  * @param isDesktop Indica layout desktop (ajusta padding).
  */
 @Composable
-private fun RecuperacaoSenhaForm(
+private fun RecuperarSenhaForm(
     onEnviarSuccess: () -> Unit,
     isDesktop: Boolean
 ) {
-    val viewModel = org.koin.compose.koinInject<RecuperacaoSenhaViewModel>()
+    val viewModel = org.koin.compose.koinInject<RecuperarSenhaViewModel>()
     val formState by viewModel.formState.collectAsState()
 
     var errorMessage by remember { mutableStateOf<String?>(null) }

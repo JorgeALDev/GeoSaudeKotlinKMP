@@ -7,7 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.geosaude.app.presentation.screens.login.LoginScreen
 import com.geosaude.app.presentation.screens.cadastro.CadastroScreen
 import com.geosaude.app.presentation.screens.main.MainScreen
-import com.geosaude.app.presentation.screens.recuperacao.RecuperacaoSenhaScreen
+import com.geosaude.app.presentation.screens.recuperarsenha.RecuperarSenhaScreen
 
 @Composable
 fun NavGraph() {
@@ -45,7 +45,10 @@ fun NavGraph() {
         }
 
         composable(Screen.RecuperarSenha.route) {
-            RecuperarSenhaScreen(onNavigateToLogin = { navController.popBackStack()})
+            RecuperarSenhaScreen(
+                onNavigateBack = { navController.popBackStack()},
+                onEnviarSuccess = { navController.popBackStack()}
+            )
         }
 
         // Tela Principal (com Bottom Nav)

@@ -1,4 +1,4 @@
-package com.geosaude.app.presentation.screens.recuperacao
+package com.geosaude.app.presentation.screens.recuperarsenha
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class RecuperacaoSenhaViewModel : ViewModel() {
+class RecuperarSenhaViewModel : ViewModel() {
 
     private val _formState = MutableStateFlow(RecuperacaoSenhaFormState())
     val formState: StateFlow<RecuperacaoSenhaFormState> = _formState.asStateFlow()
